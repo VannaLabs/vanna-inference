@@ -1,0 +1,97 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/matthewwang/Desktop/Folders/Dev/projects/Vanna/vanna-l2/vanna-inference/src/inference-server/inference-server.csproj": {}
+  },
+  "projects": {
+    "/Users/matthewwang/Desktop/Folders/Dev/projects/Vanna/vanna-l2/vanna-inference/src/inference-server/inference-server.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/matthewwang/Desktop/Folders/Dev/projects/Vanna/vanna-l2/vanna-inference/src/inference-server/inference-server.csproj",
+        "projectName": "inference-server",
+        "projectPath": "/Users/matthewwang/Desktop/Folders/Dev/projects/Vanna/vanna-l2/vanna-inference/src/inference-server/inference-server.csproj",
+        "packagesPath": "/Users/matthewwang/.nuget/packages/",
+        "outputPath": "/Users/matthewwang/Desktop/Folders/Dev/projects/Vanna/vanna-l2/vanna-inference/src/inference-server/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/matthewwang/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "default"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Grpc.AspNetCore": {
+              "target": "Package",
+              "version": "[2.52.0, )"
+            },
+            "Microsoft.AI.MachineLearning": {
+              "target": "Package",
+              "version": "[1.15.1, )"
+            },
+            "Microsoft.ML": {
+              "target": "Package",
+              "version": "[2.0.1, )"
+            },
+            "Microsoft.ML.Mkl.Redist": {
+              "target": "Package",
+              "version": "[2.0.1, )"
+            },
+            "Microsoft.ML.OnnxRuntime": {
+              "target": "Package",
+              "version": "[1.15.1, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "System.Numerics.Tensors": {
+              "target": "Package",
+              "version": "[0.1.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.100-preview.6.23330.14/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

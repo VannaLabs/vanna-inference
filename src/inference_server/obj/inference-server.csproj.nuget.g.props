@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
+    <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
+    <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/matthewwang/.nuget/packages/</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/matthewwang/.nuget/packages/</NuGetPackageFolders>
+    <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.7.0</NuGetToolVersion>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <SourceRoot Include="/Users/matthewwang/.nuget/packages/" />
+  </ItemGroup>
+  <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)microsoft.ml.onnxruntime/1.15.1/build/netstandard2.0/Microsoft.ML.OnnxRuntime.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml.onnxruntime/1.15.1/build/netstandard2.0/Microsoft.ML.OnnxRuntime.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.ml.mkl.redist/2.0.1/build/netstandard2.0/Microsoft.ML.Mkl.Redist.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml.mkl.redist/2.0.1/build/netstandard2.0/Microsoft.ML.Mkl.Redist.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.ml/2.0.1/build/netstandard2.0/Microsoft.ML.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml/2.0.1/build/netstandard2.0/Microsoft.ML.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.ai.directml/1.12.0/build/Microsoft.AI.DirectML.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ai.directml/1.12.0/build/Microsoft.AI.DirectML.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.ai.machinelearning/1.15.1/build/net5.0/Microsoft.AI.MachineLearning.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ai.machinelearning/1.15.1/build/net5.0/Microsoft.AI.MachineLearning.props')" />
+    <Import Project="$(NuGetPackageRoot)grpc.tools/2.52.0/build/Grpc.Tools.props" Condition="Exists('$(NuGetPackageRoot)grpc.tools/2.52.0/build/Grpc.Tools.props')" />
+  </ImportGroup>
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgGrpc_Tools Condition=" '$(PkgGrpc_Tools)' == '' ">/Users/matthewwang/.nuget/packages/grpc.tools/2.52.0</PkgGrpc_Tools>
+  </PropertyGroup>
+</Project>
