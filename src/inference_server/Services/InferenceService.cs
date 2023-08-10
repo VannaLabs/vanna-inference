@@ -24,6 +24,8 @@ public class InferenceService : Inference.InferenceBase
     {
         return Task.FromResult(new InferenceResult
         {
+            Tx = request.Tx,
+            Node = "0x123",
             Value = ONNXInference(request.ModelHash, request.ModelInput)
         });
     }
