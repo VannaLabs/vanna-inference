@@ -15,8 +15,12 @@ Longshot TODO Items:
 public class InferenceService : Inference.InferenceBase
 {
     private readonly ILogger<InferenceService> _logger;
+    private static string _privateKey;
+    private static string _publicKey;
     public InferenceService(ILogger<InferenceService> logger)
     {
+        _privateKey = "0xabcdefghijklmnopqrstuvwxyz";
+        _publicKey = "0x12345678910";
         _logger = logger;
     }
 
@@ -24,6 +28,8 @@ public class InferenceService : Inference.InferenceBase
     {
         return Task.FromResult(new InferenceResult
         {
+            Tx = request.Tx,
+            Node = _publicKey,
             Value = ONNXInference(request.ModelHash, request.ModelInput)
         });
     }
