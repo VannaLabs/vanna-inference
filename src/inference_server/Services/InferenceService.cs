@@ -15,22 +15,23 @@ Longshot TODO Items:
 public class InferenceService : Inference.InferenceBase
 {
     private readonly ILogger<InferenceService> _logger;
-    private static string _privateKey;
-    private static string _publicKey;
+    private static string signer;
     public InferenceService(ILogger<InferenceService> logger)
     {
-        _privateKey = "0xabcdefghijklmnopqrstuvwxyz";
-        _publicKey = "0x12345678910";
         _logger = logger;
+        signer = "0x83FFe2cbe305cCD48836b64726BdfD1fB643A13a";
     }
 
     public override Task<InferenceResult> RunInference(InferenceParameters request, ServerCallContext context)
     {
+        string result = ONNXInference(request.ModelHash, request.ModelInput);
+        string sign = nodeJSService.InvokeFromFileAsync<Result>("./js/eas/attest.js", args: new[] { request.ModelHash, request.ModelInput, result, signer })?.Message;
+
         return Task.FromResult(new InferenceResult
         {
-            Tx = request.Tx,
-            Node = _publicKey,
-            Value = ONNXInference(request.ModelHash, request.ModelInput)
+            Tx = sign,
+            Node = signer,
+            Value = result
         });
     }
 

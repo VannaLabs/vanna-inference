@@ -2,7 +2,7 @@
 import { EAS, Offchain, SchemaEncoder, SchemaRegistry } from "@ethereum-attestation-service/eas-sdk";
 import { ethers } from 'ethers';
 
-function inferenceAttestation(m, p, r) {
+module.exports = async function inferenceAttestation(m, p, r, s) {
 
   const EASContractAddress = "0xC2679fBD37d54388Ce493F1DB75320D236e1815e"; 
   const provider = ethers.providers.getDefaultProvider(
@@ -29,11 +29,11 @@ function inferenceAttestation(m, p, r) {
     revocable: false,
     version: 1,
     nonce: 0,
-    // Created inference attestation schema here on Sepolia
+    // Created inference attestation schema on Sepolia
     schema: "0x4ebe8403ef1adcca038118c856741eb16a499568ae536e70ee2d4edbdee849e1",
     refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
     data: encodedData,
-    }, "0x83FFe2cbe305cCD48836b64726BdfD1fB643A13a");
+    }, s);
   return offchainAttestation
 }
 
