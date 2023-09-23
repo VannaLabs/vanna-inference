@@ -6,7 +6,7 @@ using System.Text;
 namespace inference_server.Services;
 
 /**
-Longshot TODO Items:
+TODO Items:
 (1) Implement RLP encoding and decoding for inputs / outputs
 (2) Create flexible byte array interface for RPC (in conjunction with RLP)
 (3) Handle ONNX file-type metadata for input/output preprocessing or postprocessing
@@ -15,30 +15,31 @@ Longshot TODO Items:
 public class InferenceService : Inference.InferenceBase
 {
     private readonly ILogger<InferenceService> _logger;
-    private static string _privateKey;
-    private static string _publicKey;
+    private static string signer;
     public InferenceService(ILogger<InferenceService> logger)
     {
-        _privateKey = "0xabcdefghijklmnopqrstuvwxyz";
-        _publicKey = "0x12345678910";
         _logger = logger;
+        signer = "0x83FFe2cbe305cCD48836b64726BdfD1fB643A13a";
     }
 
     public override Task<InferenceResult> RunInference(InferenceParameters request, ServerCallContext context)
     {
+        string result = ONNXInference(request.ModelHash, request.ModelInput);
         return Task.FromResult(new InferenceResult
         {
             Tx = request.Tx,
-            Node = _publicKey,
-            Value = ONNXInference(request.ModelHash, request.ModelInput)
+            Node = signer,
+            Value = result
         });
     }
 
     public string ONNXInference(string hash, string input) 
     {
         // Generalized
-        string modelPath = "./models/" + hash + ".onnx";
+        string modelPath = "./models/" + hash;
         var inferenceSession = new InferenceSession(modelPath);
+        IReadOnlyDictionary<string, NodeMetadata> inputMetadata = inferenceSession.InputMetadata;
+        IReadOnlyDictionary<string, NodeMetadata> outputMetadata = inferenceSession.OutputMetadata;
         List<NamedOnnxValue> inferenceParams;
 
         // Flexible but need to be made generic
@@ -46,7 +47,7 @@ public class InferenceService : Inference.InferenceBase
         float[][] input2d;
 
         switch(hash) {
-            case "LinearTest":
+            case "QmXQpupTphRTeXJMEz3BCt9YUF6kikcqExxPdcVoL1BBhy":
                 input2d = parse2DInput(input);
                 inputTensor = new DenseTensor<float>(new[] { input2d.Count(), input2d[0].Count() });
                 for (int x = 0; x < input2d.Count(); x++) {
@@ -59,21 +60,18 @@ public class InferenceService : Inference.InferenceBase
                 };
                 return parseFloatResult(inferenceSession.Run(inferenceParams).ToList().Last());
             
-            case "Volatility":
+            default:
                 input2d = parse2DInput(input);
                 inferenceParams = new List<NamedOnnxValue>();
-                string[] featureNames = new string[] {"vol_1","vol_2","vol_3","vol_4","vol_5"};
+                string[] features = getInputFeatures(inputMetadata);
                 for (int x = 0; x < input2d.Count(); x++) {
                     for (int y = 0; y < input2d[0].Count(); y++) {
                         inputTensor = new DenseTensor<float>(new[] { 1, 1 });
                         inputTensor[0, 0] = input2d[x][y];
-                        inferenceParams.Add(NamedOnnxValue.CreateFromTensor<float>(featureNames[inferenceParams.Count()], inputTensor));
+                        inferenceParams.Add(NamedOnnxValue.CreateFromTensor<float>(features[inferenceParams.Count()], inputTensor));
                     }
                 }
                 return parseFloatResult(inferenceSession.Run(inferenceParams).ToList().Last());
-
-            default:
-                return "Invalid Result";
         }
     }
 
@@ -93,6 +91,16 @@ public class InferenceService : Inference.InferenceBase
         return resultList[0].ToString();
     }
 
+    public string[] getInputFeatures(IReadOnlyDictionary<string, NodeMetadata> inputMetadata) {
+        string[] features = new string[inputMetadata.Count];
+        int i = 0;
+        foreach (KeyValuePair<string, NodeMetadata> kvp in inputMetadata)
+        {
+            features[i] = kvp.Key;
+            i++;
+        }
+        return features;
+    }
     public float[] parse1DInput(string input) {   
         return System.Text.Json.JsonSerializer.Deserialize<float[]>(input);
     }
