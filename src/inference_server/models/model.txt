@@ -1,0 +1,2 @@
+QmXQpupTphRTeXJMEz3BCt9YUF6kikcqExxPdcVoL1BBhy = LassoSpreadModel.onnx
+QmYsSLRSUKBKxsNLDtpxjJRR19VyqwMayxzHyMZP58gHcs = XGBSpreadModel.onnx
