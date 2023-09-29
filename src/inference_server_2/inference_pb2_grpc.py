@@ -20,6 +20,11 @@ class InferenceStub(object):
                 request_serializer=inference__pb2.InferenceParameters.SerializeToString,
                 response_deserializer=inference__pb2.InferenceResult.FromString,
                 )
+        self.RunPipeline = channel.unary_unary(
+                '/inference.Inference/RunPipeline',
+                request_serializer=inference__pb2.PipelineParameters.SerializeToString,
+                response_deserializer=inference__pb2.InferenceResult.FromString,
+                )
 
 
 class InferenceServicer(object):
@@ -33,12 +38,23 @@ class InferenceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def RunPipeline(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_InferenceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'RunInference': grpc.unary_unary_rpc_method_handler(
                     servicer.RunInference,
                     request_deserializer=inference__pb2.InferenceParameters.FromString,
+                    response_serializer=inference__pb2.InferenceResult.SerializeToString,
+            ),
+            'RunPipeline': grpc.unary_unary_rpc_method_handler(
+                    servicer.RunPipeline,
+                    request_deserializer=inference__pb2.PipelineParameters.FromString,
                     response_serializer=inference__pb2.InferenceResult.SerializeToString,
             ),
     }
@@ -65,6 +81,23 @@ class Inference(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/inference.Inference/RunInference',
             inference__pb2.InferenceParameters.SerializeToString,
+            inference__pb2.InferenceResult.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def RunPipeline(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/inference.Inference/RunPipeline',
+            inference__pb2.PipelineParameters.SerializeToString,
             inference__pb2.InferenceResult.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

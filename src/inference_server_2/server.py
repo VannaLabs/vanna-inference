@@ -10,18 +10,29 @@ import ezkl
 import ast
 import config
 import ecdsa
+from ecdsa import SECP256k1
 from ecdsa.keys import SigningKey, VerifyingKey
+from transformers import pipeline, set_seed
 import hashlib
 
 class InferenceServer(inference_pb2_grpc.InferenceServicer):
     def RunInference(self, inferenceParams, context):
         results = self.Infer(inferenceParams.modelHash, inferenceParams.modelInput)
-        return inference_pb2.InferenceResult(tx=inferenceParams.tx, node=inferenceParams.modelHash, value=str(results))
+        return inference_pb2.InferenceResult(tx=inferenceParams.tx, node=sign(config.private_key_hex, str(results)), value=str(results))
 
     def Infer(self, modelHash, modelInput):
-        session = onnxruntime.InferenceSession(modelHash, providers=['CPUExecutionProvider'])
+        session = onnxruntime.InferenceSession(modelHash, providers=["CPUExecutionProvider"])
         results = session.run(curateOutputs(session), curateInputs(session, modelInput))[-1]
         return results[0][0]
+
+    def RunPipeline(self, pipelineParams, context):
+        results = self.Pipeline(pipelineParams.seed, pipelineParams.pipelineName, pipelineParams.modelHash, pipelineParams.modelInput)
+        return inference_pb2.InferenceResult(tx=pipelineParams.tx, node=sign(config.private_key_hex, str(results)), value=str(results))
+
+    def Pipeline(self, seed, pipelineName, model, inputs):
+        generator = pipeline(pipelineName, model=model)
+        set_seed(int(seed))
+        return generator(inputs, max_length=50, num_return_sequences=1)[0]['generated_text'].split(".")[0]
 
 def serve(port, maxWorkers):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=maxWorkers))
@@ -51,7 +62,20 @@ def curateOutputs(session):
         outputs.append(o.name)
     return outputs
 
-def sign(private_key):
-    signing_key = ecdsa.SigningKey.from_string(private_key, curve=ecdsa.SECP256k1)
+def sign(private_key_hex, message):
+    private_key = SigningKey.from_string(bytes.fromhex(private_key_hex), curve=SECP256k1)
+    signature = private_key.sign(message.encode())
+    signature_hex = signature.hex()
+    return signature_hex
+
+def verify(public_key_hex, signature_hex):
+    public_key = VerifyingKey.from_string(bytes.fromhex(public_key_hex), curve=SECP256k1)
+    try:
+        public_key.verify(signature, "message".encode())
+        return True
+    except ecdsa.BadSignatureError:
+        print("Signature cannot be verified")
+        return False
+
 
 serve(config.port, config.maxWorkers)
