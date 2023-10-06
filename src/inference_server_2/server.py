@@ -14,6 +14,7 @@ from ecdsa import SECP256k1
 from ecdsa.keys import SigningKey, VerifyingKey
 from transformers import pipeline, set_seed
 import hashlib
+from Crypto.Hash import keccak
 
 class InferenceServer(inference_pb2_grpc.InferenceServicer):
     def RunInference(self, inferenceParams, context):
@@ -64,18 +65,21 @@ def curateOutputs(session):
 
 def sign(private_key_hex, message):
     private_key = SigningKey.from_string(bytes.fromhex(private_key_hex), curve=SECP256k1)
-    signature = private_key.sign(message.encode())
-    signature_hex = signature.hex()
-    return signature_hex
+    k = keccak.new(digest_bits=256)
+    k.update(b'message')
+    print(list(k.digest()))
+    signature_hex = private_key.sign(k.digest())
+    return signature_hex.hex()
 
-def verify(public_key_hex, signature_hex):
+def verify(public_key_hex, signature_hex, value):
     public_key = VerifyingKey.from_string(bytes.fromhex(public_key_hex), curve=SECP256k1)
+    k = keccak.new(digest_bits=256)
+    k.update(bytes(value.encode()))
     try:
-        public_key.verify(signature, "message".encode())
+        public_key.verify(bytes.fromhex(signature_hex), k.digest())
         return True
     except ecdsa.BadSignatureError:
         print("Signature cannot be verified")
         return False
-
 
 serve(config.port, config.maxWorkers)
