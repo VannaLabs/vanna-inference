@@ -1,8 +1,8 @@
 import grpc
+import os
 import sys
 from concurrent import futures
 import inference_pb2_grpc 
-import onnx
 import onnxruntime
 import numpy as np
 import inference_pb2 
@@ -18,10 +18,12 @@ from Crypto.Hash import keccak
 
 class InferenceServer(inference_pb2_grpc.InferenceServicer):
     def RunInference(self, inferenceParams, context):
+        getModel(inferenceParams.modelHash)
         results = self.Infer(inferenceParams.modelHash, inferenceParams.modelInput)
         return inference_pb2.InferenceResult(tx=inferenceParams.tx, node=sign(config.private_key_hex, str(results)), value=str(results))
 
     def Infer(self, modelHash, modelInput):
+        modelHash = "./models/" + modelHash
         session = onnxruntime.InferenceSession(modelHash, providers=["CPUExecutionProvider"])
         results = session.run(curateOutputs(session), curateInputs(session, modelInput))[-1]
         return results[0][0]
@@ -63,11 +65,16 @@ def curateOutputs(session):
         outputs.append(o.name)
     return outputs
 
+def getModel(cid):
+    path = "./models/" + cid
+    if os.path.isfile(path):
+        return
+    os.system("ipfs get --output=./models/" + cid + " " + cid)
+
 def sign(private_key_hex, message):
     private_key = SigningKey.from_string(bytes.fromhex(private_key_hex), curve=SECP256k1)
     k = keccak.new(digest_bits=256)
     k.update(b'message')
-    print(list(k.digest()))
     signature_hex = private_key.sign(k.digest())
     return signature_hex.hex()
 
