@@ -1,1 +1,6 @@
-dotnet run --urls=http://0.0.0.0:5125/ 
+ipfs init
+cp ./swarm.key ~/.ipfs/swarm.key
+export LIBP2P_FORCE_PNET=1
+ipfs bootstrap add /ip4/3.140.191.156/tcp/4001/p2p/12D3KooWQWntZ1RYAxBtqbPcRz1e24o9xzXkvieJnhhNAC6xKwAF 
+ipfs daemon &
+python server.py &
