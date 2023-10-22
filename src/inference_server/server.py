@@ -24,9 +24,9 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
 
     def Infer(self, modelHash, modelInput):
         modelHash = "./models/" + modelHash
-        session = onnxruntime.InferenceSession(modelHash, providers=["CPUExecutionProvider"])
-        results = session.run(curateOutputs(session), curateInputs(session, modelInput))[-1]
-        return results[0][0]
+        output = session.run(curateOutputs(session), curateInputs(session, modelInput))[0]
+        results = unwrap(output)
+        return results
 
     def RunPipeline(self, pipelineParams, context):
         results = self.Pipeline(pipelineParams.seed, pipelineParams.pipelineName, pipelineParams.modelHash, pipelineParams.modelInput)
@@ -88,5 +88,15 @@ def verify(public_key_hex, signature_hex, value):
     except ecdsa.BadSignatureError:
         print("Signature cannot be verified")
         return False
+
+def unwrap(outputs):
+    if outputs.__class__ != list and outputs.__class__ != np.ndarray:
+        return outputs
+    if len(outputs) == 1:
+        return unwrap(outputs[0])
+    results = []
+    for x in outputs:
+        results.append(unwrap(x))
+    return results
 
 serve(config.port, config.maxWorkers)
