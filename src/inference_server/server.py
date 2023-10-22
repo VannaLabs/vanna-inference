@@ -24,6 +24,7 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
 
     def Infer(self, modelHash, modelInput):
         modelHash = "./models/" + modelHash
+        session = onnxruntime.InferenceSession(modelHash, providers=["CPUExecutionProvider"])
         output = session.run(curateOutputs(session), curateInputs(session, modelInput))[0]
         results = unwrap(output)
         return results
