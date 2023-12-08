@@ -6,7 +6,7 @@ def ezklProveSingle(modelName, transactionID, public):
     proofStrategy = "single"
     execDir = "scratch/"
     modelPath = "models/" + modelName
-    compiledModelPath = modelName + "_compiled"
+    compiledModelPath = modelPath + "_compiled"
     settingsPath = execDir + transactionID + ".settings"
     vkPath = execDir + transactionID + ".vk"
     pkPath = execDir + transactionID + ".pk"
@@ -52,19 +52,21 @@ def ezklProveSingle(modelName, transactionID, public):
     if not valid:
         raise Exception("Unable to validate ezKL proof")
 
-    vk_file = open(vkPath, "rb")
-    vk = vk_file.read() 
-    vk_file.close()
+    vkFile = open(vkPath, "rb")
+    vk = vkFile.read() 
+    vkFile.close()
 
-    srs_file = open(srsPath, "rb")
-    srs = srs_file.read() 
-    srs_file.close()
+    proofFile = open(proof_path)
+    proof = proofFile.read()
+    proofFile.close()
 
-    proof = json.load(open(proof_path))
-    results = [extractOutput(witnessPath, settingsPath), proof, vk, srs, json.load(open(settingsPath))]
+    settingsFile = open(settingsPath)
+    settings = settingsFile.read()
+    settingsFile.close()
+
+    results = [extractOutput(witnessPath, settingsPath), proof, vk, srsPath, settings]
 
     cleanUp([witnessPath, settingsPath, pkPath, vkPath, proof_path, compiledModelPath, dataPath])
-
     return results
 
 def extractOutput(witnessPath, settingsPath):

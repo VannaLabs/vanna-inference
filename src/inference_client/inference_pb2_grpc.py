@@ -20,6 +20,11 @@ class InferenceStub(object):
                 request_serializer=inference__pb2.InferenceParameters.SerializeToString,
                 response_deserializer=inference__pb2.InferenceResult.FromString,
                 )
+        self.RunZKInference = channel.unary_unary(
+                '/inference.Inference/RunZKInference',
+                request_serializer=inference__pb2.InferenceParameters.SerializeToString,
+                response_deserializer=inference__pb2.ZKInferenceResult.FromString,
+                )
         self.RunPipeline = channel.unary_unary(
                 '/inference.Inference/RunPipeline',
                 request_serializer=inference__pb2.PipelineParameters.SerializeToString,
@@ -38,6 +43,12 @@ class InferenceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def RunZKInference(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def RunPipeline(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -51,6 +62,11 @@ def add_InferenceServicer_to_server(servicer, server):
                     servicer.RunInference,
                     request_deserializer=inference__pb2.InferenceParameters.FromString,
                     response_serializer=inference__pb2.InferenceResult.SerializeToString,
+            ),
+            'RunZKInference': grpc.unary_unary_rpc_method_handler(
+                    servicer.RunZKInference,
+                    request_deserializer=inference__pb2.InferenceParameters.FromString,
+                    response_serializer=inference__pb2.ZKInferenceResult.SerializeToString,
             ),
             'RunPipeline': grpc.unary_unary_rpc_method_handler(
                     servicer.RunPipeline,
@@ -82,6 +98,23 @@ class Inference(object):
         return grpc.experimental.unary_unary(request, target, '/inference.Inference/RunInference',
             inference__pb2.InferenceParameters.SerializeToString,
             inference__pb2.InferenceResult.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def RunZKInference(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/inference.Inference/RunZKInference',
+            inference__pb2.InferenceParameters.SerializeToString,
+            inference__pb2.ZKInferenceResult.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

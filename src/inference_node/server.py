@@ -3,11 +3,10 @@ import os
 import sys
 from concurrent import futures
 import inference_pb2 
-import zkinference_pb2
 import inference_pb2_grpc 
-import zkinference_pb2_grpc
 import onnxruntime
 import numpy as np
+import json
 import ast
 import config
 import ecdsa
@@ -25,12 +24,14 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
         return inference_pb2.InferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, value=str(results))
 
     def RunZKInference(self, inferenceParams, context):
-        results = ZKInfer(inferenceParams.modelHash, inferenceParams.modelInput, inferenceParams.tx)
-        return zkinference_pb2.ZKInferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, 
+        getModel(inferenceParams.modelHash)
+        writeInput(inferenceParams.modelInput, inferenceParams.tx)
+        results = self.ZKInfer(inferenceParams.modelHash, inferenceParams.modelInput, inferenceParams.tx)
+        return inference_pb2.ZKInferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, 
             value=str(results[0]), proof=results[1], settings=results[4], vk=results[2], srs=results[3])
 
     def ZKInfer(self, modelHash, modelInput, txHash):
-        results = ezklProveSingle(modelHash, txHash, True)
+        results = zkml.ezklProveSingle(modelHash, txHash, True)
         return results
 
     def Infer(self, modelHash, modelInput):
@@ -47,6 +48,12 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
         generator = pipeline(pipelineName, model=model)
         set_seed(int(seed))
         return generator(inputs, max_length=50, num_return_sequences=1)[0]['generated_text'].split(".")[0]
+
+def writeInput(modelInput, txHash):
+    params = json.loads(modelInput)
+    data = dict(input_shapes=getShape(params), input_data=params)
+    json.dump(data, open("./scratch/" + txHash + ".input", 'w'))
+    return
 
 def serve(port, maxWorkers):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=maxWorkers))
@@ -109,5 +116,15 @@ def unwrap(outputs):
     for x in outputs:
         results.append(unwrap(x))
     return results
+
+def getShape(params):
+    if isinstance(params, list):
+        shape = []
+        if isinstance(params[0], list):
+            for p in params:
+                shape.append(getShape(p))
+        else:
+            shape.append(len(params))
+        return shape
 
 serve(config.port, config.maxWorkers)
