@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option csharp_namespace = "inference_server";
+
+package inference;
+
+// Inference service definition
+service Inference {
+  // Runs a model inference
+  rpc RunInference (InferenceParameters) returns (InferenceResult);
+  rpc RunZKInference (InferenceParameters) returns (ZKInferenceResult);
+  rpc RunPipeline (PipelineParameters) returns (InferenceResult);
+}
+
+// Inference input parameters
+message InferenceParameters {
+  string tx = 1;
+  string modelHash = 2;
+  string modelInput = 3;
+}
+
+// Pipeline input parameters
+message PipelineParameters{
+  string tx = 1;
+  string seed = 2;
+  string pipelineName = 3;
+  string modelHash = 4;
+  string modelInput = 5;
+}
+
+// The response message containing the inference result
+message InferenceResult {
+  string tx = 1;
+  string node = 2;
+  string value = 3;
+}
+
+// The response message containing the inference result and related ZK validation objects
+message ZKInferenceResult {
+  string tx = 1;
+  string node = 2;
+  string value = 3;
+  string proof = 4;
+  string settings = 5;
+  bytes vk = 6;
+  string srs = 7;
+}
