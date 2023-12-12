@@ -5,6 +5,7 @@ cd ipfs-update
 sudo bash install.sh
 sudo ipfs-update install latest
 ipfs --version
+ipfs init
 
 # Setting up Pip 
 sudo apt-get update

@@ -32,6 +32,7 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
 
     def ZKInfer(self, modelHash, modelInput, txHash):
         results = zkml.ezklProveSingle(modelHash, txHash, True)
+        results[0] = unwrap(results[0])
         return results
 
     def Infer(self, modelHash, modelInput):
