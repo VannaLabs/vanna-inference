@@ -6,8 +6,12 @@ sudo bash install.sh
 sudo ipfs-update install latest
 ipfs --version
 
+# Setting up Pip 
+sudo apt-get update
+sudo apt install python3-pip
+
 # Setting up Python requirements
-pip install grpc
+pip install grpcio
 pip install onnxruntime
 pip install ezkl
 pip install numpy
