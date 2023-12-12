@@ -12,7 +12,7 @@ def ezklProveSingle(modelName, transactionID, public):
     pkPath = execDir + transactionID + ".pk"
     witnessPath = execDir + transactionID + ".witness"
     dataPath = execDir + transactionID + ".input"
-    proof_path = execDir + transactionID + ".pf"
+    proofPath = execDir + transactionID + ".pf"
 
     runArgs = ezkl.PyRunArgs()
     runArgs.input_visibility = "public"
@@ -43,12 +43,12 @@ def ezklProveSingle(modelName, transactionID, public):
         raise Exception("Unable to setup ezKL keys")
 
     # zkML Proof Generation
-    proof = zkProve(witnessPath, compiledModelPath, pkPath, proof_path, srsPath, proofStrategy)
+    proof = zkProve(witnessPath, compiledModelPath, pkPath, proofPath, srsPath, proofStrategy)
     if not proof:
         raise Exception("Unable to generate ezKL proof")
 
     # zkML Proof Validation
-    valid = zkVerify(proof_path, settingsPath, vkPath, srsPath)
+    valid = zkVerify(proofPath, settingsPath, vkPath, srsPath)
     if not valid:
         raise Exception("Unable to validate ezKL proof")
 
@@ -56,7 +56,7 @@ def ezklProveSingle(modelName, transactionID, public):
     vk = vkFile.read() 
     vkFile.close()
 
-    proofFile = open(proof_path)
+    proofFile = open(proofPath)
     proof = proofFile.read()
     proofFile.close()
 
@@ -66,7 +66,7 @@ def ezklProveSingle(modelName, transactionID, public):
 
     results = [extractOutput(witnessPath, settingsPath), proof, vk, srsPath, settings]
 
-    cleanUp([witnessPath, settingsPath, pkPath, vkPath, proof_path, compiledModelPath, dataPath])
+    cleanUp([witnessPath, settingsPath, pkPath, vkPath, proofPath, compiledModelPath, dataPath])
     return results
 
 def extractOutput(witnessPath, settingsPath):
@@ -109,13 +109,13 @@ def zkSetup(compiledModelPath, vkPath, pkPath, srsPath):
         return False
     return True
 
-def zkProve(witnessPath, compiledModelPath, pkPath, proof_path, srsPath, proofStrategy):
-    if not ezkl.prove(witnessPath, compiledModelPath, pkPath, proof_path, srsPath, proofStrategy):
+def zkProve(witnessPath, compiledModelPath, pkPath, proofPath, srsPath, proofStrategy):
+    if not ezkl.prove(witnessPath, compiledModelPath, pkPath, proofPath, srsPath, proofStrategy):
         return False
     return True
 
-def zkVerify(proof_path, settingsPath, vkPath, srsPath):
-    if not ezkl.verify(proof_path, settingsPath, vkPath, srsPath):
+def zkVerify(proofPath, settingsPath, vkPath, srsPath):
+    if not ezkl.verify(proofPath, settingsPath, vkPath, srsPath):
         return False
     return True
 
