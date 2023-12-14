@@ -19,12 +19,14 @@ import zkml
 
 class InferenceServer(inference_pb2_grpc.InferenceServicer):
     def RunInference(self, inferenceParams, context):
-        getModel(inferenceParams.modelHash)
+        if not os.path.isfile("models/" + inferenceParams.modelHash):
+            getModel(inferenceParams.modelHash)
         results = self.Infer(inferenceParams.modelHash, inferenceParams.modelInput)
         return inference_pb2.InferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, value=str(results))
 
     def RunZKInference(self, inferenceParams, context):
-        getModel(inferenceParams.modelHash)
+        if not os.path.isfile("models/" + inferenceParams.modelHash):
+            getModel(inferenceParams.modelHash)
         writeInput(inferenceParams.modelInput, inferenceParams.tx)
         results = self.ZKInfer(inferenceParams.modelHash, inferenceParams.modelInput, inferenceParams.tx)
         return inference_pb2.ZKInferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, 
