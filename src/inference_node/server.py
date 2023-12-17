@@ -18,19 +18,29 @@ from Crypto.Hash import keccak
 import zkml
 
 class InferenceServer(inference_pb2_grpc.InferenceServicer):
+    inferenceMap = {}
+    zkInferenceMap = {}
     def RunInference(self, inferenceParams, context):
+        if inferenceParams.tx in self.inferenceMap:
+            return self.inferenceMap[inferenceParams.tx]
         if not os.path.isfile("models/" + inferenceParams.modelHash):
             getModel(inferenceParams.modelHash)
         results = self.Infer(inferenceParams.modelHash, inferenceParams.modelInput)
-        return inference_pb2.InferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, value=str(results))
+        inferenceResults = inference_pb2.InferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, value=str(results))
+        self.inferenceMap[inferenceParams.tx] = inferenceResults
+        return inferenceResult
 
     def RunZKInference(self, inferenceParams, context):
+        if inferenceParams.tx in self.zkInferenceMap:
+            return self.zkInferenceMap[inferenceParams.tx]
         if not os.path.isfile("models/" + inferenceParams.modelHash):
             getModel(inferenceParams.modelHash)
         writeInput(inferenceParams.modelInput, inferenceParams.tx)
         results = self.ZKInfer(inferenceParams.modelHash, inferenceParams.modelInput, inferenceParams.tx)
-        return inference_pb2.ZKInferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, 
+        inferenceResults = inference_pb2.ZKInferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, 
             value=str(results[0]), proof=results[1], settings=results[4], vk=results[2], srs=results[3])
+        self.zkInferenceMap[inferenceParams.tx] = inferenceResults
+        return inferenceResult
 
     def ZKInfer(self, modelHash, modelInput, txHash):
         results = zkml.ezklProveSingle(modelHash, txHash, True)
@@ -130,4 +140,4 @@ def getShape(params):
             shape.append(len(params))
         return shape
 
-serve(config.port, config.maxWorkers)
+serve(config.port, config.max_workers)
