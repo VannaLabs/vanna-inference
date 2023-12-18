@@ -28,7 +28,7 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
         results = self.Infer(inferenceParams.modelHash, inferenceParams.modelInput)
         inferenceResults = inference_pb2.InferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, value=str(results))
         self.inferenceMap[inferenceParams.tx] = inferenceResults
-        return inferenceResult
+        return inferenceResults
 
     def RunZKInference(self, inferenceParams, context):
         if inferenceParams.tx in self.zkInferenceMap:
@@ -40,7 +40,7 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
         inferenceResults = inference_pb2.ZKInferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, 
             value=str(results[0]), proof=results[1], settings=results[4], vk=results[2], srs=results[3])
         self.zkInferenceMap[inferenceParams.tx] = inferenceResults
-        return inferenceResult
+        return inferenceResults
 
     def ZKInfer(self, modelHash, modelInput, txHash):
         results = zkml.ezklProveSingle(modelHash, txHash, True)
