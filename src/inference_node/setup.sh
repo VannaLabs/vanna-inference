@@ -14,7 +14,7 @@ sudo apt install python3-pip
 # Setting up Python requirements
 pip install grpcio
 pip install onnxruntime
-pip install ezkl
+pip install ezkl==5.0.8
 pip install numpy
 pip install ecdsa
 pip install transformers
