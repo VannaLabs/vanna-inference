@@ -1,6 +1,9 @@
+# Chain Params
+sequencer_ip = "123:456:789"
+
 # Config Params
 port = 5125 
-maxWorkers = 100
+max_workers = 100
 execution = "CPUExecutionProvider"
 
 # Sample randomly generated hex public and private key, adhering to ECDSA
