@@ -23,6 +23,8 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
     def RunInference(self, inferenceParams, context):
         if inferenceParams.tx in self.inferenceMap:
             return self.inferenceMap[inferenceParams.tx]
+        elif context.peer().split(":")[1] != config.sequencer_ip: 
+            return
         if not os.path.isfile("models/" + inferenceParams.modelHash):
             getModel(inferenceParams.modelHash)
         results = self.Infer(inferenceParams.modelHash, inferenceParams.modelInput)
@@ -33,6 +35,8 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
     def RunZKInference(self, inferenceParams, context):
         if inferenceParams.tx in self.zkInferenceMap:
             return self.zkInferenceMap[inferenceParams.tx]
+        elif context.peer().split(":")[1] != config.sequencer_ip: 
+            return
         if not os.path.isfile("models/" + inferenceParams.modelHash):
             getModel(inferenceParams.modelHash)
         writeInput(inferenceParams.modelInput, inferenceParams.tx)
