@@ -11,5 +11,4 @@ The Vanna-Inference codebase contains the code needed to run a Vanna Inference N
 
 (3) Configure your inference node in `config.py` <br/>
 
-(4) Run the inference node <br/>
-`bash start.sh` <br/>
+(4) Run the inference node `bash start.sh` <br/>
