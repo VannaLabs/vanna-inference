@@ -1,6 +1,7 @@
 import ezkl
 import os
 import json
+import utils
 
 def ezklProveSingle(modelName, transactionID, public):
     proofStrategy = "single"
@@ -122,3 +123,10 @@ def zkVerify(proofPath, settingsPath, vkPath, srsPath):
 def cleanUp(paths):
     for p in paths:
         os.system("rm " + p)
+
+def writeInput(modelInput, txHash):
+    params = json.loads(modelInput)
+    data = dict(input_shapes=utils.getShape(params), input_data=params)
+    json.dump(data, open("./scratch/" + txHash + ".input", 'w'))
+    return
+
