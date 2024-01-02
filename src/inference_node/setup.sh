@@ -12,11 +12,4 @@ sudo apt-get update
 sudo apt install python3-pip
 
 # Setting up Python requirements
-pip install grpcio
-pip install onnxruntime
-pip install ezkl==5.0.8
-pip install numpy
-pip install ecdsa
-pip install transformers
-pip install hashlib
-pip install pycryptodome
+pip install grpcio onnxruntime ezkl numpy ecdsa transformers hashlib pycryptodome diffusers transformers accelerate torch --upgrade

@@ -32,14 +32,14 @@ message PipelineParameters{
 message InferenceResult {
   string tx = 1;
   string node = 2;
-  string value = 3;
+  bytes value = 3;
 }
 
 // The response message containing the inference result and related ZK validation objects
 message ZKInferenceResult {
   string tx = 1;
   string node = 2;
-  string value = 3;
+  bytes value = 3;
   string proof = 4;
   string settings = 5;
   bytes vk = 6;

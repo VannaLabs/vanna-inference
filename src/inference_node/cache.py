@@ -1,4 +1,5 @@
 import utils
+import time
 
 class InferenceCache:
 
@@ -11,9 +12,11 @@ class InferenceCache:
     	self.cache[inferenceType][tx] = value
 
     def retrieve(self, inferenceType, tx):
-    	if inferenceType in self.cache and tx in self.cache[inferenceType]:
-    		return self.cache[inferenceType][tx]
-    	else:
-    		return None
+        if inferenceType in self.cache and tx in self.cache[inferenceType]:
+            while (self.cache[inferenceType][tx] is None):
+                time.sleep(0.5)
+        else:
+            self.cache[inferenceType][tx] = None
+        return self.cache[inferenceType][tx]
 
         
