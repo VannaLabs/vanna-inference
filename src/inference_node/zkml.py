@@ -18,6 +18,7 @@ def ezklProveSingle(modelName, transactionID, public):
     runArgs = ezkl.PyRunArgs()
     runArgs.input_visibility = "public"
     runArgs.output_visibility = "public"
+    runArgs.variables = [("batch_size", 1)]
 
     if public:
         runArgs.param_visibility = "kzgcommit" 
@@ -37,11 +38,11 @@ def ezklProveSingle(modelName, transactionID, public):
     if not srsPath:
         raise Exception("Unable to obtain SRS")
 
-    if not genWitness(dataPath, compiledModelPath, witnessPath):
-        raise Exception("Unable to generate witness")
-
     if not zkSetup(compiledModelPath, vkPath, pkPath, srsPath):
         raise Exception("Unable to setup ezKL keys")
+
+    if not genWitness(dataPath, compiledModelPath, witnessPath):
+        raise Exception("Unable to generate witness")
 
     # zkML Proof Generation
     proof = zkProve(witnessPath, compiledModelPath, pkPath, proofPath, srsPath, proofStrategy)
@@ -95,7 +96,7 @@ def getSrs(settingsPath):
     # Get Reference String: Acquired from perpetual powers of Tau
     # https://github.com/privacy-scaling-explorations/perpetualpowersoftau
     settings = json.load(open(settingsPath))
-    srsPath = "srs/" + str(settings['run_args']['logrows']) + ".srs"
+    srsPath = "./srs/" + str(settings['run_args']['logrows']) + ".srs"
     if os.path.isfile(srsPath) or ezkl.get_srs(srsPath, settingsPath):
         return srsPath
     return ""
@@ -111,7 +112,11 @@ def zkSetup(compiledModelPath, vkPath, pkPath, srsPath):
     return True
 
 def zkProve(witnessPath, compiledModelPath, pkPath, proofPath, srsPath, proofStrategy):
-    if not ezkl.prove(witnessPath, compiledModelPath, pkPath, proofPath, srsPath, proofStrategy):
+    try:
+        ezkl.mock(witnessPath, compiledModelPath)
+    except:
+        return False
+    if not ezkl.prove(witnessPath, compiledModelPath, pkPath, proofPath, proofStrategy, srsPath):
         return False
     return True
 
