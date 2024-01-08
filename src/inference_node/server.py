@@ -23,13 +23,19 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
         self.txCache = cache.InferenceCache()
         self.pipelineManager = pipeline.PipelineManager()
 
+    def GetCachedInference(self, inferenceParams, context):
+        cached = self.txCache.searchCache(inferenceParams.tx)
+        if cached is None:
+            return inference_pb2.InferenceResult(inferenceType=str(utils.InferenceType.NONE))
+        return cached
+
     def RunInference(self, inferenceParams, context):
         cached = self.txCache.retrieve(utils.InferenceType.INFERENCE, inferenceParams.tx)
         if cached is not None:
             return cached
         utils.modelCheck(inferenceParams.modelHash)
         results = self.Infer(inferenceParams.modelHash, inferenceParams.modelInput)
-        inferenceResults = inference_pb2.InferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, value=bytes(results, 'utf-8'))
+        inferenceResults = inference_pb2.InferenceResult(inferenceType=str(utils.InferenceType.INFERENCE), tx=inferenceParams.tx, node=config.public_key_hex, value=bytes(results, 'utf-8'))
         self.txCache.store(utils.InferenceType.INFERENCE, inferenceParams.tx, inferenceResults)
         return inferenceResults
 
@@ -40,7 +46,7 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
         utils.modelCheck(inferenceParams.modelHash)
         zkml.writeInput(inferenceParams.modelInput, inferenceParams.tx)
         results = self.ZKInfer(inferenceParams.modelHash, inferenceParams.modelInput, inferenceParams.tx)
-        inferenceResults = inference_pb2.ZKInferenceResult(tx=inferenceParams.tx, node=config.public_key_hex, 
+        inferenceResults = inference_pb2.InferenceResult(inferenceType=str(utils.InferenceType.ZKINFERENCE), tx=inferenceParams.tx, node=config.public_key_hex, 
             value=bytes(results[0], 'utf-8'), proof=results[1], settings=results[4], vk=results[2], srs=results[3])
         self.txCache.store(utils.InferenceType.ZKINFERENCE, inferenceParams.tx, inferenceResults)
         return inferenceResults
@@ -50,7 +56,7 @@ class InferenceServer(inference_pb2_grpc.InferenceServicer):
         if cached is not None:
             return cached
         results = self.PipelineInfer(pipelineParams.seed, pipelineParams.pipelineName, pipelineParams.modelHash, pipelineParams.modelInput)
-        inferenceResults = inference_pb2.InferenceResult(tx=pipelineParams.tx, node=config.public_key_hex, value=results)
+        inferenceResults = inference_pb2.InferenceResult(inferenceType=str(utils.InferenceType.PIPELINE), tx=pipelineParams.tx, node=config.public_key_hex, value=results)
         self.txCache.store(utils.InferenceType.PIPELINE, pipelineParams.tx, inferenceResults)
         return inferenceResults
 

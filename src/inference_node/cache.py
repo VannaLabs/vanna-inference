@@ -8,6 +8,12 @@ class InferenceCache:
     	for inferenceType in utils.InferenceType:
     		self.cache[inferenceType] = {}
 
+    def searchCache(self, tx):
+        for inferenceType in utils.InferenceType:
+            if inferenceType in self.cache and tx in self.cache[inferenceType]:
+                return self.cache[inferenceType][tx]
+        return None
+
     def store(self, inferenceType, tx, value):
     	self.cache[inferenceType][tx] = value
 

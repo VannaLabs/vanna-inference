@@ -13,6 +13,8 @@ class InferenceType(Enum):
     PIPELINE = 3
     PRIVATE = 4
     OPTIMISTIC = 5
+    BATCH = 6
+    NONE = 7
 
 def unwrap(outputs):
     if outputs.__class__ != list and outputs.__class__ != np.ndarray:
