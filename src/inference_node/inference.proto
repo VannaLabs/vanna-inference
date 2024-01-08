@@ -8,8 +8,9 @@ package inference;
 service Inference {
   // Runs a model inference
   rpc RunInference (InferenceParameters) returns (InferenceResult);
-  rpc RunZKInference (InferenceParameters) returns (ZKInferenceResult);
+  rpc RunZKInference (InferenceParameters) returns (InferenceResult);
   rpc RunPipeline (PipelineParameters) returns (InferenceResult);
+  rpc GetCachedInference (InferenceParameters) returns (InferenceResult);
 }
 
 // Inference input parameters
@@ -28,20 +29,14 @@ message PipelineParameters{
   string modelInput = 5;
 }
 
-// The response message containing the inference result
+// The response message containing the inference result and related fields
 message InferenceResult {
-  string tx = 1;
-  string node = 2;
-  bytes value = 3;
-}
-
-// The response message containing the inference result and related ZK validation objects
-message ZKInferenceResult {
-  string tx = 1;
-  string node = 2;
-  bytes value = 3;
-  string proof = 4;
-  string settings = 5;
-  bytes vk = 6;
-  string srs = 7;
+  string inferenceType = 1;
+  string tx = 2;
+  string node = 3;
+  bytes value = 4;
+  string proof = 5;
+  string settings = 6;
+  bytes vk = 7;
+  string srs = 8;
 }
